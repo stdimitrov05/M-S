@@ -48,7 +48,7 @@
                 </li>
                 <li>
                     <label for="image"></label>
-                    <input type="file" class="inputFields" accept="image/*" name="image" required />
+                    <input type="file" class="inputFields" accept="image/jpeg image/jpg image/png image/gif" name="image" required />
                 </li>
                 <li id="center-btn">
                     <input type="submit" id="join-btn" name="register" alt="Join" class="btn" value="Sign Up">

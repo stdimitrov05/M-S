@@ -11,37 +11,43 @@ $password = $_POST["password"];
 if (!empty($name) && !empty($password)) {
     $sql = new CallMysql_QueryDB();
 
+
     if ($sql->SqlQuerybyDb()->UserCheckByName($name)) {
         echo "$name - This name already exist!";
     } else {
-        if (isset($_FILES['image'])) {
-            $img_name = $_FILES['image']['name'];
-            $img_type = $_FILES['image']['type'];
-            $tmp_name = $_FILES['image']['tmp_name'];
+    }
+    if (isset($_FILES['image'])) {
+        $target_dir =  __DIR__ . "/img/profile";
+        
+        $target_file = $target_dir . "/" . basename($_FILES["image"]["name"]);
+        echo $target_file;
+        echo "<pre>"; echo "POST:"; print_r($_POST); echo "FILES:"; print_r($_FILES); echo "</pre>";
+        if (file_exists($target_file)) {
+            echo "file already exists.<br>";
 
-            $img_explode = explode('.', $img_name);
-            $img_ext = end($img_explode);
 
-            $extensions = ["jpeg", "png", "jpg", "gif"];
-            if (in_array($img_ext, $extensions) === true) {
-                $types = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
-                if (in_array($img_type, $types) === true) {
-                    $time = time();
-                    $new_img_name = $time . $img_name;
-                    if (move_uploaded_file($tmp_name, "img/profile" . $new_img_name)) {
 
-                        $encrypt_pass = md5($password);
-                        $sql->SqlQuerybyDb()->CreateUserData($name, $encrypt_pass, $new_img_name);
-                        header("location: ../view/home.php");
-                    } else {
-                        echo "Something went wrong. Please try again!";
-                    }
-                }
+            // Delete the temp file
+
+          
+
+            if (move_uploaded_file(
+                $_FILES["image"]["tmp_name"],
+                $target_file
+            )) {
+                $img_explode = explode('.', $img_name);
+                $img_ext = end($img_explode);
+                $time = time();
+                $new_img_name = $time . $img_name;
+
+                $encrypt_pass = md5($password);
+                $sql->SqlQuerybyDb()->CreateUserData($name, $encrypt_pass, $new_img_name);
+                header("location: ../view/home.php");
             } else {
-                echo "Please upload an image file - jpeg, png, jpg";
+                echo "Sorry, there was an error uploading your file.<br>";
+
+                unlink($_FILES["upload"]["tmp_name"]);
             }
-        } else {
-            echo "Please upload an image file - jpeg, png, jpg";
         }
     }
 } else {
